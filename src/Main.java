@@ -90,7 +90,7 @@ public class Main {
         // Example method calls for CRUD operations
         //app.addStudent("Jonah", "pasquantonio", "Jonah.Pasquantonio@gmail.com", java.sql.Date.valueOf("2024-06-01"));
         //app.updateStudentEmail(4,"j.p@gmail.com");
-        //app.deleteStudent(4);
+        app.deleteStudent(4);
         app.getAllStudents();
     }
 }
