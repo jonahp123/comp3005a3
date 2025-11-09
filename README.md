@@ -45,4 +45,5 @@ The application shows a menu with 5 options:
 
 ## Video Demo
 
-https://youtu.be/Qa1VL23oyEk
+OLD VERSION (WATCH IF YOU WANT):https://youtu.be/Qa1VL23oyEk
+UPDATED VIDEO: WATCH THIS ONE https://youtu.be/HovoRRi9XiI
