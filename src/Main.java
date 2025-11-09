@@ -4,13 +4,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Scanner;
 
 public class Main {
     // Database connection parameters
     private final String url = "jdbc:postgresql://localhost:5432/A3";
     private final String user = "postgres";
     private final String password = "postgres";
-    
+    private final Scanner scanner = new Scanner(System.in);
     
     // Retrieves and displays all students from the database
     public void getAllStudents() {
@@ -20,16 +21,18 @@ public class Main {
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(SQL)) {
             
-            // Print each student's information
+            System.out.println("\nID\tFirst Name\tLast Name\tEmail\t\t\t\tEnrollment Date");            
             while (rs.next()) {
-                System.out.println(rs.getInt("student_id") + "\t" +
-                                   rs.getString("first_name") + "\t" +
-                                   rs.getString("last_name") + "\t" +
-                                   rs.getString("email") + "\t" +
+                System.out.printf("%d\t%-15s\t%-15s\t%-30s\t%s%n",
+                                   rs.getInt("student_id"),
+                                   rs.getString("first_name"),
+                                   rs.getString("last_name"),
+                                   rs.getString("email"),
                                    rs.getDate("enrollment_date"));
             }
+            System.out.println();
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
+            System.out.println("Error: " + ex.getMessage());
         }
     }
     
@@ -45,10 +48,10 @@ public class Main {
             pstmt.setString(3, email);
             pstmt.setDate(4, enrollmentDate);
             pstmt.executeUpdate();
-            System.out.println("Student added successfully!");
+            System.out.println("Student added successfully!\n");
             
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
+            System.out.println("Error: " + ex.getMessage());
         }
     }
 
@@ -61,11 +64,16 @@ public class Main {
             
             pstmt.setString(1, new_email);
             pstmt.setInt(2, student_id);
-            pstmt.executeUpdate();
-            System.out.println("Student email updated successfully!");
+            int rowsAffected = pstmt.executeUpdate();
+            
+            if (rowsAffected > 0) {
+                System.out.println("Email updated successfully!\n");
+            } else {
+                System.out.println("Student not found.\n");
+            }
             
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
+            System.out.println("Error: " + ex.getMessage());
         }
     }
 
@@ -77,20 +85,75 @@ public class Main {
              PreparedStatement pstmt = conn.prepareStatement(SQL)) {
             
             pstmt.setInt(1, student_id);
-            pstmt.executeUpdate();
-            System.out.println("Student deleted successfully!");
+            int rowsAffected = pstmt.executeUpdate();
+            
+            if (rowsAffected > 0) {
+                System.out.println("Student deleted successfully!\n");
+            } else {
+                System.out.println("Student not found.\n");
+            }
             
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
+            System.out.println("Error: " + ex.getMessage());
+        }
+    }
+    
+    // Main application loop
+    public void run() {
+        System.out.println("\n=== Student Management System ===\n");
+        
+        while (true) {
+            System.out.println("1. View All Students");
+            System.out.println("2. Add Student");
+            System.out.println("3. Update Email");
+            System.out.println("4. Delete Student");
+            System.out.println("5. Exit");
+            System.out.print("\nChoice: ");
+            
+            try {
+                int choice = Integer.parseInt(scanner.nextLine());
+                
+                switch (choice) {
+                    case 1:
+                        getAllStudents();
+                        break;
+                    case 2:
+                        System.out.print("First name: ");
+                        String firstName = scanner.nextLine();
+                        System.out.print("Last name: ");
+                        String lastName = scanner.nextLine();
+                        System.out.print("Email: ");
+                        String email = scanner.nextLine();
+                        System.out.print("Enrollment date (YYYY-MM-DD): ");
+                        String date = scanner.nextLine();
+                        addStudent(firstName, lastName, email, java.sql.Date.valueOf(date));
+                        break;
+                    case 3:
+                        System.out.print("Student ID: ");
+                        int id = Integer.parseInt(scanner.nextLine());
+                        System.out.print("New email: ");
+                        String newEmail = scanner.nextLine();
+                        updateStudentEmail(id, newEmail);
+                        break;
+                    case 4:
+                        System.out.print("Student ID: ");
+                        int deleteId = Integer.parseInt(scanner.nextLine());
+                        deleteStudent(deleteId);
+                        break;
+                    case 5:
+                        System.out.println("\nGoodbye!\n");
+                        scanner.close();
+                        return;
+                    default:
+                        System.out.println("Invalid choice.\n");
+                }
+            } catch (Exception ex) {
+                System.out.println("Invalid input.\n");
+            }
         }
     }
     
     public static void main(String[] args) {
-        Main app = new Main();
-        // Example method calls for CRUD operations
-        //app.addStudent("Jonah", "pasquantonio", "Jonah.Pasquantonio@gmail.com", java.sql.Date.valueOf("2024-06-01"));
-        //app.updateStudentEmail(4,"j.p@gmail.com");
-        app.deleteStudent(4);
-        app.getAllStudents();
+        new Main().run();
     }
 }
